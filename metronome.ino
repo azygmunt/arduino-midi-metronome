@@ -42,10 +42,10 @@ int buttonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
 int lastButtonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
 
 // the last time the output pin was toggled
-long lastDebounceTime[6] = { 0, 0, 0, 0, 0, 0 };
+unsigned long lastDebounceTime[6] = { 0, 0, 0, 0, 0, 0 };
 
 // the debounce time; increase if the output flickers
-long debounceDelay = 50;
+unsigned long debounceDelay = 50;
 
 // for storing button states
 int buttonFlag[6] = { false, false, false, false, false, false };
@@ -547,7 +547,6 @@ void lightOff() {
 	digitalWrite(pin_G, LOW);
 	digitalWrite(pin_B, LOW);
 }
-
 
 //print a number on the display. args are the number to display and to and from column places.
 //higher powers are discarded if there are insufficient display digits. ex 123->23

@@ -548,6 +548,7 @@ void lightOff() {
 	digitalWrite(pin_B, LOW);
 }
 
+
 //print a number on the display. args are the number to display and to and from column places.
 //higher powers are discarded if there are insufficient display digits. ex 123->23
 void printDigits(int v, int p1, int p2) {

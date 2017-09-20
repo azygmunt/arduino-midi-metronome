@@ -23,10 +23,10 @@
 #define sw2 A2
 
 //RGB values for events
-const bool downbeat[3] = { 0, 1, 0 };
-const bool beat[3] = { 1, 0, 0 };
-const bool beat_and[3] = { 0, 0, 1 };
-const bool clock_event[3] = { 0, 1, 0 };
+const unsigned int downbeat[3] = { 0, 1, 0 };
+const unsigned int beat[3] = { 1, 0, 0 };
+const unsigned int beat_and[3] = { 0, 0, 1 };
+const unsigned int clock_event[3] = { 0, 1, 0 };
 
 //set up the LED 7-segment display
 LedControl disp = LedControl(5, 7, 6, 1);
@@ -36,10 +36,10 @@ b0, b1, b2, sw0, sw1, sw2 };
 
 //for debouncing input
 // the current reading from the input pin
-int buttonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
+boolean buttonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
 
 // the previous reading from the input pin
-int lastButtonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
+boolean lastButtonState[6] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
 
 // the last time the output pin was toggled
 unsigned long lastDebounceTime[6] = { 0, 0, 0, 0, 0, 0 };
@@ -48,8 +48,8 @@ unsigned long lastDebounceTime[6] = { 0, 0, 0, 0, 0, 0 };
 unsigned long debounceDelay = 50;
 
 // for storing button states
-int buttonFlag[6] = { false, false, false, false, false, false };
-long buttonTime[6] = { 0, 0, 0, 0, 0, 0 };
+boolean buttonFlag[6] = { false, false, false, false, false, false };
+unsigned long buttonTime[6] = { 0, 0, 0, 0, 0, 0 };
 
 //incoming midi info
 byte incomingByte;
@@ -68,13 +68,13 @@ const byte midi_noteon = 0x9F; //note on for channel 16
 const byte midi_noteoff = 0x8F; //note off for channel 16
 
 //counters
-int cc = 0; //clock counter
-int bc = 0; //beat counter
-int nc = 0; //note counter
-int mc = 0; //measure counter
+unsigned int cc = 0; //clock counter
+unsigned int bc = 0; //beat counter
+unsigned int nc = 0; //note counter
+unsigned int mc = 0; //measure counter
 
 //free mode tempo
-int tempo = 120;
+unsigned int tempo = 120;
 const unsigned long tempo_blink = 10; //length of light blink in ms
 const unsigned long tempo_hold_start_length = 250; //starting delay for tempo hold inc/dec
 const unsigned long tempo_hold_end_length = 25; //shortest delay for tempo hold inc/dec
@@ -84,7 +84,7 @@ unsigned long tempo_msp = millis(); //holds the millisecond of the previous beat
 unsigned long tempo_ms = 60000 / tempo;
 
 //flag for keeping track of tempo light
-bool t_lit = false;
+boolean t_lit = false;
 
 //midi states
 int action = 2; //0 =note off ; 1=note on ; 2= nothing
@@ -94,7 +94,7 @@ int play_flag = 0; // whether or not clock play has been received
 const int tick_note = 42;
 
 //default time signature
-int timesig = 4;
+unsigned int timesig = 4;
 
 //time signature subdivision
 int sd = 2;
@@ -522,7 +522,7 @@ void startupAnimation() {
 	}
 }
 
-void flashBeat(int d) {
+void flashBeat(unsigned int d) {
 	if (bc == 1) { //first beat - flash downbeat
 		lightRGB(downbeat);
 	} else { //regular beat - flash beat color
@@ -532,7 +532,7 @@ void flashBeat(int d) {
 	printDigits(bc, 4 - d, 3);
 }
 
-void lightRGB(const bool rgb[3]) {
+void lightRGB(const unsigned int rgb[3]) {
 	if (buttonState[3] == LOW) {
 		digitalWrite(pin_R, rgb[0]);
 		digitalWrite(pin_G, rgb[1]);
@@ -550,17 +550,17 @@ void lightOff() {
 
 //print a number on the display. args are the number to display and to and from column places.
 //higher powers are discarded if there are insufficient display digits. ex 123->23
-void printDigits(int v, int p1, int p2) {
+void printDigits(unsigned int v, unsigned int p1, unsigned int p2) {
 	//p1 and p2 are led digit positions (from p1 to p2) valid range 0..3
-	int d[4]; //digits
-	int ex[4] = { 10, 100, 1000, 10000 };
+	unsigned int d[4]; //digits
+	unsigned int ex[4] = { 10, 100, 1000, 10000 };
 	int range = p2 - p1 + 1;
 	int c = v;
 
 	//ditch negatives
-	if (v < 0) {
-		return;
-	}
+	//if (v < 0) {
+	//	return;
+	//}
 
 	//chop off preceding digits
 	for (int i = 0; i < range; ++i) {

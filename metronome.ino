@@ -95,6 +95,8 @@ unsigned long sd_ms = 60000 / (tempo * sd);
 
 //flag for keeping track of subdivided tempo light
 boolean sd_lit = false;
+
+//flag for keeping track of the song position
 boolean spFlag = false;
 
 MIDI_CREATE_DEFAULT_INSTANCE();
@@ -102,7 +104,7 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 void setup() {
 	//start serial with midi baudrate 31250 or 38400 for debugging or 115200 for usb serial
 	Serial.begin(115200);
-	MIDI.begin();
+	MIDI.begin(16);
 	MIDI.setHandleStart(startClock);
 	MIDI.setHandleStop(stopClock);
 	MIDI.setHandleContinue(continueClock);
@@ -206,7 +208,6 @@ void stopClock() {
 
 void continueClock() {
 	clock_flag = true;
-	//mc = 88;
 }
 
 void handleSongPosition(unsigned int beats) {
@@ -219,24 +220,20 @@ void handleSongPosition(unsigned int beats) {
 }
 
 void handleNoteOn(byte inChannel, byte inNote, byte inVelocity) {
-	printDigits(int(inNote), 0, 3);
-	/*
-	 //this is a note on event. flash the light.
-	 if (inChannel == 16) {
-	 if (inNote == 42) {
-	 //if the velocity is 127 it is a downbeat. otherwise it is a regular beat. color accordingly
-	 if (inVelocity == 127) {
-	 lightRGB(downbeat);
-	 nc = 1;
-	 printDigits(mc, 0, 1);
-	 ++mc;
-	 } else {
-	 lightRGB(beat);
-	 ++nc;
-	 }
-	 printDigits(nc, 2, 3);
-	 }
-	 }*/
+	//use sonar's default metronome note
+	if (inNote == 42) {
+		//if the velocity is 127 it is a downbeat. otherwise it is a regular beat. color accordingly
+		if (inVelocity == 127) {
+			lightRGB(downbeat);
+			nc = 1;
+			printDigits(mc, 0, 1);
+			++mc;
+		} else {
+			lightRGB(beat);
+			++nc;
+		}
+		printDigits(nc, 2, 3);
+	}
 }
 
 void handleNoteOff(byte inChannel, byte inNote, byte inVelocity) {
@@ -273,52 +270,6 @@ void modeMidi() {
 
 	MIDI.read();
 
-//read input from serial port and parse incoming midi
-	/*if (Serial.available() > 0) {
-	 incomingByte = Serial.read();
-	 switch (incomingByte) {
-	 case (midi_noteon):
-	 action = 1;
-	 break;
-	 case (midi_noteoff):
-	 action = 0;
-	 break;
-	 default: //deal with notes rather than clock events
-	 // wait for a status-byte, channel 10, note on or off
-	 if ((action == 0) && (note == 0)) {
-	 lightOff();
-	 note = incomingByte;
-	 note = 0;
-	 velocity = 0;
-	 action = 2;
-	 } else if ((action == 1) && (note == 0)) { //we got a note on event. get which note
-	 note = incomingByte;
-	 } else if ((action == 1) && (note != 0)) { //we got the note. next byte is velocity
-	 velocity = incomingByte;
-	 //if velocity is 0 this is a pseudo noteoff. turn off the light
-	 if (velocity == 0) {
-	 lightOff();
-	 } else if (note == tick_note) {
-	 //this is a note on event. flash the light.
-	 //if the velocity is 127 it is a downbeat. otherwise it is a regular beat. color accordingly
-	 if (velocity == 127) {
-	 lightRGB(downbeat, 255);
-	 nc = 1;
-	 printDigits(mc, 0, 1);
-	 ++mc;
-	 } else {
-	 lightRGB(beat, 64);
-	 ++nc;
-	 }
-	 printDigits(nc, 2, 3);
-	 }
-	 note = 0;
-	 velocity = 0;
-	 action = 0;
-	 }
-	 break;
-	 }
-	 }*/
 }
 
 //routine that deals with keeping track of beats based on milliseconds
@@ -566,6 +517,15 @@ void startupAnimation() {
 	disp.shutdown(0, false);
 	disp.clearDisplay(0);
 	int j = 0;
+	for (int i = 0; i < 24; ++i) {
+		disp.setIntensity(0, i * 2 / 3);
+		delay(50);
+		if (i % 6 == 0) {
+			disp.setChar(0, j, '8', true);
+			++j;
+		}
+	}
+	j = 0;
 	for (int i = 0; i < 24; ++i) {
 		disp.setIntensity(0, i * 2 / 3);
 		delay(50);

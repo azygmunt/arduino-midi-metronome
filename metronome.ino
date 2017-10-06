@@ -252,6 +252,15 @@ void handleNoteOn(byte inChannel, byte inNote, byte inVelocity) {
 	case 5:
 		beat[2] = inVelocity * 2;
 		break;
+	case 6:
+		beat_and[0] = inVelocity * 2;
+		break;
+	case 7:
+		beat_and[1] = inVelocity * 2;
+		break;
+	case 8:
+		beat_and[2] = inVelocity * 2;
+		break;
 	}
 }
 

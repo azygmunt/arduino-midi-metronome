@@ -20,10 +20,10 @@
 #define sw2 A2
 
 //RGB values for events
-const unsigned int downbeat[3] = { 255, 255, 255 };
-const unsigned int beat[3] = { 8, 8, 10 };
-const unsigned int beat_and[3] = { 0, 0, 63 };
-const unsigned int clock_event[3] = { 0, 1, 0 };
+unsigned int downbeat[3] = { 255, 255, 255 };
+unsigned int beat[3] = { 8, 8, 10 };
+unsigned int beat_and[3] = { 0, 0, 63 };
+unsigned int clock_event[3] = { 0, 1, 0 };
 
 //set up the LED 7-segment display
 LedControl disp = LedControl(5, 7, 6, 1);
@@ -192,8 +192,7 @@ void startClock() {
 	//set the display to " 1 1"
 	disp.setChar(0, 0, ' ', false);
 	disp.setDigit(0, 1, 1, false);
-	disp.setChar(0, 2, ' ', false);
-	disp.setDigit(0, 3, 1, false);
+	flashBeat(2);
 }
 
 void stopClock() {
@@ -221,7 +220,8 @@ void handleSongPosition(unsigned int beats) {
 
 void handleNoteOn(byte inChannel, byte inNote, byte inVelocity) {
 	//use sonar's default metronome note
-	if (inNote == 42) {
+	switch (inNote) {
+	case 42:
 		//if the velocity is 127 it is a downbeat. otherwise it is a regular beat. color accordingly
 		if (inVelocity == 127) {
 			lightRGB(downbeat);
@@ -233,6 +233,25 @@ void handleNoteOn(byte inChannel, byte inNote, byte inVelocity) {
 			++nc;
 		}
 		printDigits(nc, 2, 3);
+		break;
+	case 0:
+		downbeat[0] = inVelocity * 2;
+		break;
+	case 1:
+		downbeat[1] = inVelocity * 2;
+		break;
+	case 2:
+		downbeat[2] = inVelocity * 2;
+		break;
+	case 3:
+		beat[0] = inVelocity * 2;
+		break;
+	case 4:
+		beat[1] = inVelocity * 2;
+		break;
+	case 5:
+		beat[2] = inVelocity * 2;
+		break;
 	}
 }
 
